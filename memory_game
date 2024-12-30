@@ -1,0 +1,217 @@
+Game Plan: Memory Game
+1. User Interaction
+Input Method: Mouse clicks.
+Players interact by clicking on cards to flip them.
+Once two cards are flipped, the game checks for a match.
+
+2. Rules
+The game consists of a grid of cards, each with a hidden symbol on the back.
+Players can flip only two cards at a time.
+If the symbols on the flipped cards match:
+The cards remain flipped and are removed from play.
+If they do not match:
+The cards are flipped back over after a short delay.
+The game continues until all pairs are matched.
+
+3. Win/Lose Conditions
+Win: The player wins by matching all pairs of cards.
+Optional Lose Condition (for added difficulty):
+Introduce a time limit. The player loses if the time runs out before all pairs are matched.
+
+4. Scoring System
+Track the number of attempts (flipping two cards counts as one attempt).
+Fewer attempts result in a higher score.
+Optional: Introduce a timer to challenge players and reward faster completions.
+
+5. Engagement
+Increasing Difficulty:
+Start with a small grid (e.g., 4x4) and increase the grid size as the player progresses.
+Sound Effects:
+Add sound when cards are flipped, matched, or mismatched.
+Animations:
+Add flipping animations for visual appeal.
+Themes:
+Introduce themes for card designs (e.g., animals, emojis, numbers).
+Answering Design Questions
+How will the user interact with your game?
+
+The user interacts via mouse clicks to flip cards.
+What are the rules of your game?
+
+Flip two cards to find matching pairs.
+Matched pairs stay visible, while mismatched pairs flip back.
+Clear the board to win.
+What makes it challenging or engaging?
+
+Limited time (optional).
+Increasing grid size for advanced levels.
+Dynamic animations and sound effects.
+How does a player win or lose?
+
+Win: Match all pairs to clear the board.
+Optional Lose: Fail to clear the board within a time limit.
+How does your game remain fresh and engaging?
+
+Introduce levels with increasing difficulty.
+Add themes for card designs.
+Reward players with faster scores or fewer attempts.
+
+
+
+
+Solution:
+
+HTML:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Memory Game</h1>
+        <p>Match all the pairs to win!</p>
+    </header>
+    
+    <main id="game-board"></main>
+
+    <footer>
+        <p>Attempts: <span id="attempts">0</span></p>
+        <p>&copy; 2024 Memory Game</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+
+CSS:
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+    text-align: center;
+}
+
+header {
+    background-color: #4CAF50;
+    color: white;
+    padding: 1rem;
+}
+
+#game-board {
+    display: grid;
+    grid-template-columns: repeat(4, 100px);
+    gap: 10px;
+    justify-content: center;
+    margin: 20px auto;
+    max-width: 450px;
+}
+
+.card {
+    width: 100px;
+    height: 100px;
+    background-color: #ddd;
+    border: 2px solid #ccc;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    color: transparent;
+    transition: transform 0.3s;
+}
+
+.card.flipped {
+    background-color: #fff;
+    color: black;
+    transform: rotateY(180deg);
+}
+
+footer {
+    background-color: #333;
+    color: white;
+    padding: 1rem;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+
+Javascript:
+const gameBoard = document.getElementById('game-board');
+const attemptsDisplay = document.getElementById('attempts');
+let attempts = 0;
+
+// Card symbols (pairs)
+const symbols = ['🍎', '🍎', '🍌', '🍌', '🍇', '🍇', '🍓', '🍓'];
+
+// Shuffle symbols
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+// Create cards
+function createCards() {
+    const shuffledSymbols = shuffle(symbols);
+    shuffledSymbols.forEach(symbol => {
+        const card = document.createElement('div');
+        card.classList.add('card');
+        card.dataset.symbol = symbol;
+        card.textContent = symbol;
+        gameBoard.appendChild(card);
+        card.addEventListener('click', flipCard);
+    });
+}
+
+// Game variables
+let flippedCards = [];
+let matchedPairs = 0;
+
+// Flip card
+function flipCard() {
+    if (this.classList.contains('flipped') || flippedCards.length === 2) {
+        return;
+    }
+
+    this.classList.add('flipped');
+    flippedCards.push(this);
+
+    if (flippedCards.length === 2) {
+        checkMatch();
+    }
+}
+
+// Check for match
+function checkMatch() {
+    const [card1, card2] = flippedCards;
+    if (card1.dataset.symbol === card2.dataset.symbol) {
+        matchedPairs++;
+        flippedCards = [];
+        if (matchedPairs === symbols.length / 2) {
+            alert(`You win! Total attempts: ${attempts}`);
+        }
+    } else {
+        setTimeout(() => {
+            card1.classList.remove('flipped');
+            card2.classList.remove('flipped');
+            flippedCards = [];
+        }, 1000);
+    }
+    attempts++;
+    attemptsDisplay.textContent = attempts;
+}
+
+// Initialize game
+createCards();
+
+
+
